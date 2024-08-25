@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
@@ -34,3 +35,15 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+=======
+# my-todo-app
+A To-Do List application built with React, TypeScript, and Next.js. This project demonstrates state management, server-side rendering (SSR), and component-based architecture.
+
+Here are the objectives of this project:
+
+Create a form for adding new tasks.
+Display a list of tasks that are retrieved via a simple API.
+Manage state to track the list of tasks.
+Use TypeScript for typing components and data.
+Leverage Next.js capabilities for Server-Side Rendering (SSR).
+>>>>>>> c2b62059d33f1f88ad908abc70121457d6754243

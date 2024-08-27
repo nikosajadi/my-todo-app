@@ -1,45 +1,11 @@
 
 import { useState } from "react";
-// // Input field to capture the title of the new task.
-// const Home =()=> {
-//     const [task, setTask] = useState <string> ('');
-//     const [tasks, setTasks] = useState<string[]>([]);
-
-
-//   //when the user wants to add a new task to the list
-//   const addTask = ():void => {
-//     if (task.trim())  {
-//       setTasks([...tasks, task]);
-//       setTask('');
-//     }
-//   };
-//   return (
-//     <div>
-//       <h1>My To-Do List</h1>
-//       <input
-//         type="text"
-//         value={task}
-//         onChange={(e) => setTask(e.target.value)}
-//         placeholder="Add a new task"
-//       />
-//       <button onClick={addTask}>Add Task</button>
-//       <ul>
-//         {tasks.map((t, index) => (
-//           <li key={index}>{t}</li>
-//         ))}
-//       </ul>
-//     </div>
-//   );
-// };
-//   export default Home;
-//---------------------------------------------
 import { GetServerSideProps } from 'next';
 
 // Define a TypeScript type for a Task
-
 type Task = {
-  id: number;     
-  title: string;  
+  id: number;     // Each task has an 'id' of type number
+  title: string;  // Each task has a 'title' of type string
 };
 
 // Define a TypeScript type for the component's props
@@ -74,7 +40,7 @@ const Home = ({ initialTasks }: Props) => {
         onChange={(e) => setTask(e.target.value)}  // Update 'task' state as the user types
         placeholder="Add a new task"  // Placeholder text for the input field
       />
-      
+      {/* Button to add the new task to the list */}
       <button onClick={addTask}>Add Task</button>
       
       {/* Display the list of tasks */}
@@ -107,4 +73,4 @@ export const getServerSideProps: GetServerSideProps = async () => {
   };
 };
 
-export default Home;  
+export default Home;  // Export the Home component as the default export

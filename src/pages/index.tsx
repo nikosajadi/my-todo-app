@@ -1,71 +1,132 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GetServerSideProps } from 'next';
+
 
 // Define a TypeScript type for a Task
 type Task = {
-  id: number;     // Each task has an 'id' of type number
-  title: string;  // Each task has a 'title' of type string
+  id: number;     
+  title: string;  
 };
 
-// Define a TypeScript type for the component's props
-type Props = {
-  initialTasks: Task[];  // The component expects an array of Task objects as props
+
+type HomePage  = {
+  initialTasks: Task[]; 
 };
 
-const Home = ({ initialTasks }: Props) => {
-  // Define state 'tasks' to hold an array of task titles (strings)
-  const [tasks, setTasks] = useState<string[]>(
-    initialTasks.map(task => task.title) // Initialize state with the titles of the initial tasks
-  );
+const Home = ({ initialTasks }: HomePage) => {
+const [tasks, setTasks] = useState<Task[]>(initialTasks);
+const [taskTitle, setTaskTitle] = useState<string>('');
 
-  // Define state 'task' to hold the value of the current input (the new task to be added)
-  const [task, setTask] = useState<string>('');
 
-  // Function to add a new task to the list
-  const addTask = () => {
-    if (task.trim()) {  // Check if the task is not empty or just whitespace
-      setTasks([...tasks, task]);  // Add the new task to the 'tasks' array
-      setTask('');  // Clear the input field after adding the task
+
+useEffect(()=> {
+  const fetchUpdatedTasks = async () =>{
+    const res = await fetch('/api/tasks'); 
+    const data = await res.json();
+    setTasks(data);
+  }
+
+  fetchUpdatedTasks();
+}, []); 
+
+
+
+ // Add a new task
+ const handleAddTask = async () => {
+  if (taskTitle.trim()) {
+    const newTask = { id: Date.now(), title: taskTitle };
+    const res = await fetch('/api/tasks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newTask),
+    });
+
+    if (res.ok) {
+      setTasks([...tasks, newTask]);
+      setTaskTitle('');
+    }
+  }
+};
+  // Edit an existing task
+  const handleEditTask = async (id: number, newTitle: string) => {
+    const updatedTask = { id, title: newTitle };
+    const res = await fetch(`/api/tasks/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedTask),
+    });
+
+    if (res.ok) {
+      setTasks(tasks.map(task => (task.id === id ? updatedTask : task)));
+    }
+  };
+
+  // Delete a task
+  const handleDeleteTask = async (id: number) => {
+
+    const res = await fetch(`/api/tasks/${id}`, {
+      method: 'DELETE',
+
+    });
+ 
+    if (res.ok) {
+      setTasks(tasks.filter(task => task.id !== id));
     }
   };
 
   return (
+
     <div>
       <h1>My To-Do List</h1>
       {/* Input field to enter a new task */}
       <input
+      id="task-input"
         type="text"
-        value={task}  // Bind the input value to the 'task' state
-        onChange={(e) => setTask(e.target.value)}  // Update 'task' state as the user types
+        value={taskTitle}  // Bind the input value to the 'task' state
+        onChange={(e) => setTaskTitle(e.target.value)}  // Update 'task' state as the user types
         placeholder="Add a new task"  // Placeholder text for the input field
       />
       {/* Button to add the new task to the list */}
-      <button onClick={addTask}>Add Task</button>
+      <button onClick={handleAddTask}>Add Task</button>
       
       {/* Display the list of tasks */}
       <ul>
-        {tasks.map((t, index) => (
-          <li key={index}>{t}</li>  // Render each task title as a list item
+        {tasks.map((task) => (
+          <li key={task.id}>
+
+         <input 
+         type="task"
+         value={task.title}
+         onChange={(e) => handleEditTask(task.id, e.target.value)} 
+         />
+        <button
+              onClick={() => handleDeleteTask(task.id)}
+              aria-label={`Delete task ${task.title}`}
+             
+            >
+              Delete
+            </button>
+
+          </li>  
         ))}
       </ul>
     </div>
   );
 };
 
-// This function is called on the server side to fetch data before rendering the page
-export const getServerSideProps: GetServerSideProps = async () => {
-  // Fetch data from an external API
-  const res = await fetch('https://jsonplaceholder.typicode.com/todos?_limit=5');
-  const data = await res.json();  // Parse the JSON response
+// Fetch initial tasks from server-side
+export const getServerSideProps = async () => {
+  // Simulate fetching tasks from a database or an API
+  const initialTasks = [
+    { id: 1, title: 'Learn React' },
+    { id: 2, title: 'Learn TypeScript' },
+  ];
 
-  // Map the fetched data to an array of Task objects
-  const initialTasks: Task[] = data.map((task: any) => ({
-    id: task.id,
-    title: task.title,
-  }));
-
-  // Return the fetched tasks as props to the Home component
   return {
     props: {
       initialTasks,

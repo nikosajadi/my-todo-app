@@ -20,12 +20,14 @@ const [taskTitle, setTaskTitle] = useState<string>('');
 
 
 
-useEffect(()=> {
-  const fetchUpdatedTasks = async () =>{
-    const res = await fetch('/api/tasks'); 
-    const data = await res.json();
-    setTasks(data);
-  }
+useEffect(() => {
+  const fetchUpdatedTasks = async () => {
+    const res = await fetch('/api/tasks');
+    if (res.ok) {
+      const data = await res.json();
+      setTasks(data);
+    }
+  };
 
   fetchUpdatedTasks();
 }, []); 
@@ -68,17 +70,18 @@ useEffect(()=> {
 
   // Delete a task
   const handleDeleteTask = async (id: number) => {
-
-    const res = await fetch(`/api/tasks/${id}`, {
-      method: 'DELETE',
-
-    });
- 
-    if (res.ok) {
-      setTasks(tasks.filter(task => task.id !== id));
-    }
-  };
-
+    console.log("Attempting to delete task with ID:", id);
+      const res = await fetch(`/api/tasks/${id}`, {
+        method: 'DELETE',
+      });
+  
+      if (res.ok) {
+        console.log("Task deleted successfully:", id);
+        setTasks(tasks.filter(task => task.id !== id));
+      } else {
+        console.error("Failed to delete task:", id, res.status);
+      }
+    };
   return (
 
     <div>
@@ -105,10 +108,7 @@ useEffect(()=> {
          onChange={(e) => handleEditTask(task.id, e.target.value)} 
          />
         <button
-              onClick={() => handleDeleteTask(task.id)}
-              aria-label={`Delete task ${task.title}`}
-             
-            >
+              onClick={() => handleDeleteTask(task.id)}  >
               Delete
             </button>
 
@@ -120,7 +120,7 @@ useEffect(()=> {
 };
 
 // Fetch initial tasks from server-side
-export const getServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async () => {
   // Simulate fetching tasks from a database or an API
   const initialTasks = [
     { id: 1, title: 'Learn React' },

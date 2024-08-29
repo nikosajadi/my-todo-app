@@ -84,8 +84,10 @@ useEffect(() => {
     };
   return (
 
-    <div>
-      <h1>My To-Do List</h1>
+    <div className="max-w-lg mx-auto mt-10">
+    <h1 className="text-3xl font-bold text-center mb-6">My To-Do List</h1>
+    <div className="flex mb-4">
+      
       {/* Input field to enter a new task */}
       <input
       id="task-input"
@@ -95,19 +97,19 @@ useEffect(() => {
         placeholder="Add a new task"  // Placeholder text for the input field
       />
       {/* Button to add the new task to the list */}
-      <button onClick={handleAddTask}>Add Task</button>
-      
+      <button className="bg-blue-500 text-white p-2 rounded-r-md hover:bg-blue-600" onClick={handleAddTask}>Add Task</button>
+      </div>
       {/* Display the list of tasks */}
-      <ul>
+      <ul className="list-disc pl-5">
         {tasks.map((task) => (
-          <li key={task.id}>
+          <li key={task.id} className="flex items-center justify-between mb-2">
 
          <input 
          type="task"
          value={task.title}
          onChange={(e) => handleEditTask(task.id, e.target.value)} 
          />
-        <button
+        <button className="bg-blue-500 text-white p-2 rounded-r-md hover:bg-blue-600"
               onClick={() => handleDeleteTask(task.id)}  >
               Delete
             </button>

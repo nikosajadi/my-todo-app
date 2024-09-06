@@ -1,121 +1,108 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useReducer } from "react";
+import { taskReducer } from '../reducers/taskReducer';
 import { GetServerSideProps } from 'next';
+import { ADD_TASK, EDIT_TASK, DELETE_TASK, TOGGLE_COMPLETE, SET_TASKS } from '../reducers/actionTypes';
 
-// Define a TypeScript type for a Task
-type Task = {
-  id: number;      // Unique identifier for each task
-  title: string;   // The title or description of the task
-};
 
-// Define the props type for the Home component
-type HomePage = {
-  initialTasks: Task[];  // Array of tasks passed as initial data from server-side
-};
+interface Task {
+  id: string;
+  title: string;
+  completed: boolean;
+}
 
-const Home = ({ initialTasks }: HomePage) => {
-  // State to hold the list of tasks
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
-  // State to hold the title of a new task being added
-  const [taskTitle, setTaskTitle] = useState<string>('');
+const TaskComponent = ({ initialTasks }) => {
+  const [state, dispatch] = useReducer(taskReducer, initialTasks);
+  const [taskTitle, setTaskTitle] = useState(""); // useState for input field
 
-  // useEffect to fetch updated tasks when the component mounts
+  // Fetch tasks from an API (if needed)
+  const fetchTasks = async () => {
+    const fetchedTasks = await getTasksFromAPI(); // Replace with actual API call
+    dispatch({ type: SET_TASKS, payload: { tasks: fetchedTasks } });
+  };
+
   useEffect(() => {
-    const fetchUpdatedTasks = async () => {
-      const res = await fetch('/api/tasks');  // Fetch tasks from the API
-      if (res.ok) {
-        const data = await res.json();  // Parse the JSON response
-        setTasks(data);  // Update the tasks state with the fetched data
+    const fetchTasks = async () => {
+      try {
+        const response = await fetch('/api/tasks'); // تماس به API داخلی
+        if (!response.ok) {
+          throw new Error('Failed to fetch tasks');
+        }
+        const fetchedTasks = await response.json(); // تبدیل پاسخ به JSON
+        dispatch({ type: SET_TASKS, payload: { tasks: fetchedTasks } });
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
       }
     };
+  }, []);
 
-    fetchUpdatedTasks();  // Call the function to fetch tasks
-  }, []);  // Empty dependency array ensures this runs only once when the component mounts
-
-  // Function to handle adding a new task
-  const handleAddTask = async () => {
-    if (taskTitle.trim()) {  // Check if the task title is not empty
-      const newTask = { id: Date.now(), title: taskTitle };  // Create a new task object
-      const res = await fetch('/api/tasks', {
-        method: 'POST',  // Use POST method to add a new task
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newTask),  // Send the new task data in the request body
-      });
-
-      if (res.ok) {
-        setTasks([...tasks, newTask]);  // Add the new task to the current list of tasks
-        setTaskTitle('');  // Clear the input field after adding the task
-      }
+  // Add new task
+  const handleAddTask = () => {
+    if (taskTitle.trim()) {
+      const newTask: Task = {
+        id: Date.now().toString(),
+        title: taskTitle,
+        completed: false,
+      };
+      dispatch({ type: ADD_TASK, payload: { task: newTask } });
+      setTaskTitle(""); // Clear input after adding task
     }
   };
 
-  // Function to handle editing an existing task
-  const handleEditTask = async (id: number, newTitle: string) => {
-    const updatedTask = { id, title: newTitle };  // Create an updated task object
-    const res = await fetch(`/api/tasks/${id}`, {
-      method: 'PUT',  // Use PUT method to update the task
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updatedTask),  // Send the updated task data in the request body
-    });
-
-    if (res.ok) {
-      // Update the tasks state with the edited task
-      setTasks(tasks.map(task => (task.id === id ? updatedTask : task)));
-    }
+  // Edit task
+  const handleEditTask = (taskId: string, newTitle: string) => {
+    dispatch({ type: EDIT_TASK, payload: { id: taskId, title: newTitle } });
   };
 
-  // Function to handle deleting a task
-  const handleDeleteTask = async (id: number) => {
-    console.log("Attempting to delete task with ID:", id);
-    const res = await fetch(`/api/tasks/${id}`, {
-      method: 'DELETE',  // Use DELETE method to remove the task
-    });
+  // Delete task
+  const handleDeleteTask = (taskId: string) => {
+    dispatch({ type: DELETE_TASK, payload: { id: taskId } });
+  };
 
-    if (res.ok) {
-      console.log("Task deleted successfully:", id);
-      // Update the tasks state to remove the deleted task
-      setTasks(tasks.filter(task => task.id !== id));
-    } else {
-      console.error("Failed to delete task:", id, res.status);
-    }
+  // Toggle task completion
+  const handleToggleComplete = (taskId: string) => {
+    dispatch({ type: TOGGLE_COMPLETE, payload: { id: taskId } });
   };
 
   return (
     <div className="max-w-lg mx-auto mt-10">
       <h1 className="text-3xl font-bold text-center mb-6">My To-Do List</h1>
       <div className="flex mb-4">
-        {/* Input field to enter a new task */}
         <input
           id="task-input"
           type="text"
-          value={taskTitle}  // Bind the input value to the 'taskTitle' state
-          onChange={(e) => setTaskTitle(e.target.value)}  // Update 'taskTitle' state as the user types
-          placeholder="Add a new task"  // Placeholder text for the input field
+          value={taskTitle}
+          onChange={(e) => setTaskTitle(e.target.value)}
+          placeholder="Add a new task"
+          className="border p-2 rounded-l-md w-full"
         />
-        {/* Button to add the new task to the list */}
-        <button className="bg-blue-500 text-white p-2 rounded-r-md hover:bg-blue-600" onClick={handleAddTask}>
+        <button
+          className="bg-blue-500 text-white p-2 rounded-r-md hover:bg-blue-600"
+          onClick={handleAddTask}
+        >
           Add Task
         </button>
       </div>
-      {/* Display the list of tasks */}
       <ul className="list-disc pl-5">
-        {tasks.map((task) => (
+        {state.map((task) => (
           <li key={task.id} className="flex items-center justify-between mb-2">
-            {/* Input field to edit the task title */}
-            <input 
+            <input
+              type="checkbox"
+              checked={task.completed}
+              onChange={() => handleToggleComplete(task.id)}
+            />
+            <input
               type="text"
               value={task.title}
-              onChange={(e) => handleEditTask(task.id, e.target.value)} 
+              onChange={(e) => handleEditTask(task.id, e.target.value)}
+              className="border p-1 w-full ml-2"
             />
-            {/* Button to delete the task */}
-            <button className="bg-blue-500 text-white p-2 rounded-r-md hover:bg-blue-600"
-              onClick={() => handleDeleteTask(task.id)}>
+            <button
+              className="bg-red-500 text-white p-2 rounded-md ml-2 hover:bg-red-600"
+              onClick={() => handleDeleteTask(task.id)}
+            >
               Delete
             </button>
-          </li>  
+          </li>
         ))}
       </ul>
     </div>
@@ -124,10 +111,9 @@ const Home = ({ initialTasks }: HomePage) => {
 
 // Fetch initial tasks from server-side
 export const getServerSideProps: GetServerSideProps = async () => {
-  // Simulate fetching tasks from a database or an API
-  const initialTasks = [
-    { id: 1, title: 'Learn React' },
-    { id: 2, title: 'Learn TypeScript' },
+  const initialTasks: Task[] = [
+    { id: "1", title: "Learn React", completed: false },
+    { id: "2", title: "Learn TypeScript", completed: false },
   ];
 
   return {
@@ -137,4 +123,4 @@ export const getServerSideProps: GetServerSideProps = async () => {
   };
 };
 
-export default Home;  // Export the Home component as the default export
+export default TaskComponent;

@@ -19,10 +19,12 @@ export const taskReducer = (state: Task[], action: Action): Task[] => {
   switch (action.type) {
     case SET_TASKS:
       return action.payload.tasks;
+
+
     case ADD_TASK:
       const newTask: Task = {
         id: Date.now().toString(),
-        title: action.payload.title,
+        title: action.payload.task.title,  // دسترسی به title از task
         completed: false,
       };
       return [newTask, ...state];

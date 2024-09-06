@@ -9,10 +9,10 @@ let tasks = [
   { id: 1, title: 'Learn React' },
   { id: 2, title: 'Learn TypeScript' },
 ];
-export default function handler(req, res) {
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
   console.log('HTTP Method:', method);
-
+  
   let state = index;
 
   switch (method) {

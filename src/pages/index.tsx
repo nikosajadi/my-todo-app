@@ -3,25 +3,20 @@ import { taskReducer } from '../reducers/taskReducer';
 import { GetServerSideProps } from 'next';
 import { ADD_TASK, EDIT_TASK, DELETE_TASK, TOGGLE_COMPLETE, SET_TASKS } from '../reducers/actionTypes';
 
-
 interface Task {
   id: string;
   title: string;
   completed: boolean;
 }
-
 const TaskComponent = ({ initialTasks }) => {
   const [state, dispatch] = useReducer(taskReducer, initialTasks);
   const [taskTitle, setTaskTitle] = useState(""); // useState for input field
 
-  // Fetch tasks from an API (if needed)
-  const fetchTasks = async () => {
-    const fetchedTasks = await getTasksFromAPI(); // Replace with actual API call
-    dispatch({ type: SET_TASKS, payload: { tasks: fetchedTasks } });
-  };
+
 
   useEffect(() => {
     const fetchTasks = async () => {
+      console.log("Updated state:", state);
       try {
         const response = await fetch('/api/tasks'); // تماس به API داخلی
         if (!response.ok) {
@@ -32,21 +27,34 @@ const TaskComponent = ({ initialTasks }) => {
       } catch (error) {
         console.error('Error fetching tasks:', error);
       }
+
     };
-  }, []);
+    console.log("Updated state:", state);
+    //fetchTasks();  // فراخوانی تابع داخل useEffect
+     
+  }, [state]);
+ 
 
   // Add new task
   const handleAddTask = () => {
     if (taskTitle.trim()) {
+      console.log("Current Task Title:", taskTitle);  // لاگ برای بررسی taskTitle
+
       const newTask: Task = {
         id: Date.now().toString(),
         title: taskTitle,
         completed: false,
       };
+
+      console.log("Dispatching new task:", newTask);
       dispatch({ type: ADD_TASK, payload: { task: newTask } });
-      setTaskTitle(""); // Clear input after adding task
-    }
-  };
+
+
+       setTaskTitle("");  // پاکسازی ورودی بعد از اضافه شدن وظیفه
+  } else {
+    console.log("Task title is empty");
+  }
+};
 
   // Edit task
   const handleEditTask = (taskId: string, newTitle: string) => {

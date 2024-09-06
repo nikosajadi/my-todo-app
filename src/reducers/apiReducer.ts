@@ -17,7 +17,8 @@ interface Task {
       case 'GET_TASKS':
         return action.payload;
       case 'ADD_TASK':
-        return [action.payload, ...state];
+        return [...state, action.payload.task];
+
       case 'UPDATE_TASK':
         return state.map(task => 
           task.id === action.payload.id ? { ...task, title: action.payload.title } : task

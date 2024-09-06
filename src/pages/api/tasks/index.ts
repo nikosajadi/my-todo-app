@@ -9,6 +9,12 @@ let index = [
   { id: 2, title: 'Learn TypeScript' },
 ];
 
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { method } = req;
+  console.log('HTTP Method:', method);
+}
+
+
 export default function handler(req, res) {
   const { method } = req;
   console.log('HTTP Method:', method);

@@ -1,47 +1,42 @@
-
-import { taskReducer } from '@/reducers/taskReducer';
+import { useContext } from 'react';
+import { TaskContext } from '@/context/taskContext';
 import { ADD_TASK, EDIT_TASK, DELETE_TASK, TOGGLE_COMPLETE, SET_TASKS } from '@/reducers/actionTypes';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-// In-memory task storage, each task has an 'id' and 'title'.
-let index = [
-  { id: 1, title: 'Learn React' },
-  { id: 2, title: 'Learn TypeScript' },
-];
+// Removing in-memory task storage as tasks will come from Context
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  const taskContext = useContext(TaskContext); // Access the global task context
+
+  if (!taskContext) {
+    return res.status(500).json({ message: 'Task context not found' });
+  }
+
+  const { tasks, dispatch } = taskContext; // Destructure tasks and dispatch from context
+
   const { method } = req;
-  console.log('HTTP Method:', method);
-}
-
-
-export default function handler(req, res) {
-  const { method } = req;
-  console.log('HTTP Method:', method);
-
-  let state = index;
 
   switch (method) {
     case 'GET':
-      res.status(200).json(state);
+      res.status(200).json(tasks); // Return tasks from context
       break;
 
     case 'POST':
       const newTask = req.body;
-      state = taskReducer(state, { type: ADD_TASK, payload: newTask });
+      dispatch({ type: ADD_TASK, payload: newTask }); // Dispatch ADD_TASK action
       res.status(201).json(newTask);
       break;
 
     case 'PUT':
       const { id, title } = req.body;
-      state = taskReducer(state, { type: UPDATE_TASK, payload: { id, title } });
+      dispatch({ type: EDIT_TASK, payload: { id, title } }); // Dispatch EDIT_TASK action
       res.status(200).json({ id, title });
       break;
 
     case 'DELETE':
-      const taskId = parseInt(req.query.id, 10);
-      state = taskReducer(state, { type: DELETE_TASK, payload: { id: taskId } });
-      res.status(200).json({ id: taskId });
+      const taskId = parseInt(req.query.id as string, 10);
+      dispatch({ type: DELETE_TASK, payload: { id: taskId } }); // Dispatch DELETE_TASK action
+      res.status(204).end();
       break;
 
     default:
@@ -49,6 +44,4 @@ export default function handler(req, res) {
       res.status(405).end(`Method ${method} Not Allowed`);
       break;
   }
-
-  index = state; // Update the in-memory storage with the new state
 }

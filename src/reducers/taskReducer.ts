@@ -1,14 +1,22 @@
 
-
-import { ADD_TASK, EDIT_TASK, DELETE_TASK, TOGGLE_COMPLETE, SET_TASKS } from './actionTypes';
-
+import { ADD_TASK, EDIT_TASK, DELETE_TASK, TOGGLE_COMPLETE, SET_TASKS } from '@/reducers/actionTypes';
 // Define the structure of a Task
 interface Task {
   id: string;
   title: string;
   completed: boolean;
 }
-
+interface Action {
+  type: string;
+  payload: any;
+}
+// در فایل taskReducer.ts
+const initialState: Task[] = [
+  { id: '1', title: 'Learn React', completed: false },
+  { id: '2', title: 'Learn TypeScript', completed: true },
+  { id: '3', title: 'Learn React', completed: false },
+  { id: '4', title: 'Learn TypeScript', completed: true }
+]; // مقداردهی اولیه محلی
 // Define the structure of each Action type
 type Action = 
   | { type: 'ADD_TASK'; payload: { taskTitle: string } }

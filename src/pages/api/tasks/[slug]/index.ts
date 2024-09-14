@@ -1,15 +1,17 @@
 import { useContext } from 'react';
 import { TaskContext } from '@/context/taskContext';
 import { ADD_TASK, EDIT_TASK, DELETE_TASK, TOGGLE_COMPLETE, SET_TASKS } from '@/reducers/actionTypes';
+
 import { NextApiRequest, NextApiResponse } from 'next';
 
 
-let tasks = [
+// در فایل taskReducer.ts
+const initialState: Task[] = [
   { id: '1', title: 'Learn React', completed: false },
-  { id: '2', title: 'Learn TypeScript', completed: false },
-  { id: '3', title: 'Build a To-Do App', completed: true },
-  {id: '2', title: 'Learn Next.js', completed: false },
-];
+  { id: '2', title: 'Learn TypeScript', completed: true },
+  { id: '3', title: 'Learn React', completed: false },
+  { id: '4', title: 'Learn TypeScript', completed: true }
+]; // مقداردهی اولیه محلی
 
 
 // Removing in-memory task storage as tasks will come from Context

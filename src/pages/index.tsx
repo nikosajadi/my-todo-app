@@ -114,6 +114,8 @@
 import React from 'react';
 import { TaskProvider } from '@/context/taskContext'; // وارد کردن TaskProvider
 import LocalTaskComponent  from '@/components/localTaskComponent'
+
+
 const IndexPage: React.FC = () => {
   return (
     <TaskProvider>  {/* TaskProvider در سطح والد قرار دارد */}
@@ -121,5 +123,6 @@ const IndexPage: React.FC = () => {
     </TaskProvider>
   );
 };
+
 
 export default IndexPage;

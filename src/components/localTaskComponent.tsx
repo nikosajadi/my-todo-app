@@ -1,47 +1,6 @@
 
-// import React, { useContext } from 'react';
-// import { TaskContext } from '@/context/taskContext'; // وارد کردن TaskContext
-
-// const TaskComponent: React.FC = () => {
-//   // استفاده از useContext برای دسترسی به context
-//   const taskContext = useContext(TaskContext); 
-
-//   // بررسی اینکه آیا context وجود دارد یا خیر
-//   if (!taskContext) {
-//     return <div>Task context not found</div>; 
-//   }
-
-//   // دسترسی به state و dispatch از context
-//   const { state, dispatch } = taskContext;
-
-//   // عملکرد افزودن تسک جدید
-//   const handleAddTask = () => {
-//     const newTask = {
-//       id: Date.now().toString(),
-//       title: 'New Task',
-//       completed: false,
-//     };
-//     dispatch({ type: 'ADD_TASK', payload: newTask });
-//   };
-
-//   return (
-//     <div>
-//       <h1>Task List</h1>
-//       <ul>
-//         {state.map((task) => (
-//           <li key={task.id}>
-//             {task.title} - {task.completed ? 'Completed' : 'Not Completed'}
-//           </li>
-//         ))}
-//       </ul>
-//       <button onClick={handleAddTask}>Add Task</button>
-//     </div>
-//   );
-// };
-
-// export default TaskComponent;
 import React, { useState, useEffect, useContext } from 'react';
-import { TaskContext } from '@/context/taskContext'; // وارد کردن Context از پوشه context
+import { TaskContext } from '@/context/taskContext'; 
 
 interface Task {
   id: string;
@@ -57,50 +16,115 @@ const LocalTaskComponent: React.FC = () => {
   }
 
   const { state, dispatch } = taskContext;  // دسترسی به state و dispatch
-
   const [taskTitle, setTaskTitle] = useState<string>("");
 
-  useEffect(() => {
-    // Fetch tasks from API (if needed)
-    const fetchTasks = async () => {
-      try {
-        const response = await fetch("/api/tasks"); // Fetching from API
-        if (!response.ok) throw new Error("Failed to fetch tasks");
-        const fetchedTasks = await response.json();
-        dispatch({ type: 'SET_TASKS', payload: { tasks: fetchedTasks } });
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-      }
-    };
+ 
+  // Function to fetch tasks from the server
+  const fetchTasks = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/tasks');
+      if (!response.ok) throw new Error('Failed to fetch tasks');
+      const fetchedTasks = await response.json();
 
-    fetchTasks(); // Trigger fetching on component mount
+      console.log('fetchedTasks : ' , fetchedTasks)
+      dispatch({ type: 'SET_TASKS', payload: { tasks: fetchedTasks } });
+
+      console.log('state : ' , state)
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  // Fetch tasks when the component is mounted
+  useEffect(() => {
+    fetchTasks();
   }, [dispatch]);
 
-  // Add new task
-  const handleAddTask = () => {
+   // Add new task
+  const handleAddTask = async () => {
     if (taskTitle.trim()) {
       const newTask: Task = {
         id: Date.now().toString(),
         title: taskTitle,
         completed: false,
       };
-      dispatch({ type: 'ADD_TASK', payload: newTask });
-      setTaskTitle(""); // Clear input after adding task
+
+      try {
+        const response = await fetch('/api/tasks', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newTask),
+        });
+
+        if (!response.ok) throw new Error('Failed to add task');
+        await fetchTasks();  // Refetch tasks after adding the new task
+      } catch (error) {
+        console.error('Error adding task:', error);
+      } finally {
+        setTaskTitle('');  // Clear input after adding task
+      }
     } else {
       console.log("Task title is empty");
     }
   };
 
-  const handleEditTask = (taskId: string, newTitle: string) => {
-    dispatch({ type: 'EDIT_TASK', payload: { id: taskId, title: newTitle } });
+  // Edit task
+  const handleEditTask = async (taskId: string, newTitle: string) => {
+    try {
+      const response = await fetch('/api/tasks', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: taskId, title: newTitle }),
+      });
+
+      if (!response.ok) throw new Error('Failed to edit task');
+      await fetchTasks();  // Refetch tasks after editing
+    } catch (error) {
+      console.error('Error editing task:', error);
+    }
   };
 
-  const handleDeleteTask = (taskId: string) => {
-    dispatch({ type: 'DELETE_TASK', payload: { id: taskId } });
+  // Delete task
+  const handleDeleteTask = async (taskId: string) => {
+    try {
+      const response = await fetch(`/api/tasks?id=${taskId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error('Failed to delete task');
+      await fetchTasks();  // Refetch tasks after deletion
+    } catch (error) {
+      console.error('Error deleting task:', error);
+    }
   };
 
-  const handleToggleComplete = (taskId: string) => {
-    dispatch({ type: 'TOGGLE_COMPLETE', payload: { id: taskId } });
+  // Toggle task completion
+  const handleToggleComplete = async (taskId: string) => {
+    const task = state.find((t: Task) => t.id == taskId);
+    if (!task) return;
+
+    try {
+      const response = await fetch(`/api/tasks`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: taskId, completed: !task.completed }),
+      });
+
+      if (!response.ok) throw new Error('Failed to toggle task completion');
+      await fetchTasks();  // Refetch tasks after toggling completion
+    } catch (error) {
+      console.error('Error toggling task completion:', error);
+    }
   };
 
   return (
@@ -119,34 +143,37 @@ const LocalTaskComponent: React.FC = () => {
         </button>
       </div>
 
-      {/* بررسی وجود state.tasks و استفاده از map در صورت وجود */}
-      <ul className="list-disc pl-5">
-        {Array.isArray(state.tasks) && state.tasks.length > 0 ? (
-          state.tasks.map((task: Task) => (
-            <li key={task.id} className="flex items-center justify-between mb-2">
-              <input
-                type="checkbox"
-                checked={task.completed}
-                onChange={() => handleToggleComplete(task.id)}
-              />
-              <input
-                type="text"
-                value={task.title}
-                onChange={(e) => handleEditTask(task.id, e.target.value)}
-                className="border p-1 w-full ml-2"
-              />
-              <button
-                className="bg-red-500 text-white p-2 ml-2 rounded-md"
-                onClick={() => handleDeleteTask(task.id)}
-              >
-                Delete
-              </button>
-            </li>
-          ))
-        ) : (
-          <p>No tasks available</p>  // نمایش پیام در صورت خالی بودن لیست تسک‌ها
-        )}
-      </ul>
+      {loading ? (
+        <p>Loading tasks...</p>
+      ) : (
+        <ul className="list-disc pl-5">
+          {Array.isArray(state) && state.length > 0 ? (
+            state.map((task: Task) => (
+              <li key={task.id} className="flex items-center justify-between mb-2">
+                <input
+                  type="checkbox"
+                  checked={task.completed}
+                  onChange={() => handleToggleComplete(task.id)}
+                />
+                <input
+                  type="text"
+                  value={task.title}
+                  onChange={(e) => handleEditTask(task.id, e.target.value)}
+                  className="border p-1 w-full ml-2"
+                />
+                <button
+                  className="bg-red-500 text-white p-2 ml-2 rounded-md"
+                  onClick={() => handleDeleteTask(task.id)}
+                >
+                  Delete
+                </button>
+              </li>
+            ))
+          ) : (
+            <p>No tasks available</p>
+          )}
+        </ul>
+      )}
     </div>
   );
 };

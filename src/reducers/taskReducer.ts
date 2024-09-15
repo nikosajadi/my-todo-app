@@ -10,13 +10,13 @@ interface Action {
   type: string;
   payload: any;
 }
-// در فایل taskReducer.ts
+
 const initialState: Task[] = [
   { id: '1', title: 'Learn React', completed: false },
   { id: '2', title: 'Learn TypeScript', completed: true },
   { id: '3', title: 'Learn React', completed: false },
   { id: '4', title: 'Learn TypeScript', completed: true }
-]; // مقداردهی اولیه محلی
+]
 // Define the structure of each Action type
 type Action = 
   | { type: 'ADD_TASK'; payload: { taskTitle: string } }

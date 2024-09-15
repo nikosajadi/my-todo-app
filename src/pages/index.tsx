@@ -1,118 +1,7 @@
 
-// import React, { useState, useEffect, useContext } from 'react';
-// import { TaskProvider } from '@/context/taskContext'; // وارد کردن TaskProvider
-// import { TaskContext } from '@/context/taskContext'; // وارد کردن Context از پوشه context
-// //import TaskComponent from '@/components/taskComponent'; // وارد کردن TaskComponent از پوشه components
-
-
-// interface Task {
-//   id: string;
-//   title: string;
-//   completed: boolean;
-// }
-
-// const LocalTaskComponent: React.FC = () => {
-//   const taskContext = useContext(TaskContext);  // دسترسی به context
-  
-//   if (!taskContext) {
-//     return <div>Task context not found</div>;  // مدیریت خطا در صورت نبودن context
-//   }
-
-//   const { state, dispatch } = taskContext;  // دسترسی به state و dispatch
-
-//   const [taskTitle, setTaskTitle] = useState<string>("");
-
-//   useEffect(() => {
-//     // Fetch tasks from API (if needed)
-//     const fetchTasks = async () => {
-//       try {
-//         const response = await fetch("/api/tasks"); // Fetching from API
-//         if (!response.ok) throw new Error("Failed to fetch tasks");
-//         const fetchedTasks = await response.json();
-//         dispatch({ type: 'SET_TASKS', payload: { tasks: fetchedTasks } });
-//       } catch (error) {
-//         console.error("Error fetching tasks:", error);
-//       }
-//     };
-
-//     fetchTasks(); // Trigger fetching on component mount
-//   }, [dispatch]);
- 
-
-//   // Add new task
-//   const handleAddTask = () => {
-//     if (taskTitle.trim()) {
-//       const newTask: Task = {
-//         id: Date.now().toString(),
-//         title: taskTitle,
-//         completed: false,
-//       };
-//       dispatch({ type: 'ADD_TASK', payload: newTask });
-//       setTaskTitle(""); // Clear input after adding task
-//     } else {
-//       console.log("Task title is empty");
-//     }
-//   };
-
-//   const handleEditTask = (taskId: string, newTitle: string) => {
-//     dispatch({ type: 'EDIT_TASK', payload: { id: taskId, title: newTitle } });
-//   };
-
-//   const handleDeleteTask = (taskId: string) => {
-//     dispatch({ type: 'DELETE_TASK', payload: { id: taskId } });
-//   };
-
-//   const handleToggleComplete = (taskId: string) => {
-//     dispatch({ type: 'TOGGLE_COMPLETE', payload: { id: taskId } });
-//   };
-
-//   return (
-//     <TaskProvider>
-    
-//     <div className="max-w-lg mx-auto mt-10">
-//       <h1 className="text-3xl font-bold text-center mb-6">To-Do List</h1>
-//       <div className="flex mb-4">
-//         <input
-//           type="text"
-//           value={taskTitle}
-//           onChange={(e) => setTaskTitle(e.target.value)}
-//           placeholder="Add a new task"
-//           className="input px-2 py-1 rounded-md w-full"
-//         />
-//         <button className="bg-blue-500 text-white px-4 py-2 ml-2 rounded-md" onClick={handleAddTask}>
-//           Add Task
-//         </button>
-//       </div>
-//       <ul className="list-disc pl-5">
-//         {state.tasks.map((task: Task) => (
-//           <li key={task.id} className="flex items-center justify-between mb-2">
-//             <input
-//               type="checkbox"
-//               checked={task.completed}
-//               onChange={() => handleToggleComplete(task.id)}
-//             />
-//             <input
-//               type="text"
-//               value={task.title}
-//               onChange={(e) => handleEditTask(task.id, e.target.value)}
-//               className="border p-1 w-full ml-2"
-//             />
-//             <button className="bg-red-500 text-white p-2 ml-2 rounded-md" onClick={() => handleDeleteTask(task.id)}>
-//               Delete
-//             </button>
-//           </li>
-//         ))}
-//       </ul>
-//     </div>
-
-//     </TaskProvider>
-//   );
-// };
-
-// export default LocalTaskComponent;
 
 import React from 'react';
-import { TaskProvider } from '@/context/taskContext'; // وارد کردن TaskProvider
+import { TaskProvider } from '@/context/taskContext'; 
 import LocalTaskComponent  from '@/components/localTaskComponent'
 
 
@@ -120,7 +9,7 @@ const IndexPage: React.FC = () => {
   return (
     
 
-    <TaskProvider>  {/* TaskProvider در سطح والد قرار دارد */}
+    <TaskProvider>  
       <LocalTaskComponent />
     </TaskProvider>
   

@@ -17,7 +17,7 @@ const LocalTaskComponent: React.FC = () => {
 
   const { state, dispatch } = taskContext;  // دسترسی به state و dispatch
   const [taskTitle, setTaskTitle] = useState<string>("");
-
+  const [loading, setLoading] = useState<boolean>(false);  // اضافه کردن state برای loading
  
   // Function to fetch tasks from the server
   const fetchTasks = async () => {
@@ -126,51 +126,55 @@ const LocalTaskComponent: React.FC = () => {
       console.error('Error toggling task completion:', error);
     }
   };
-
   return (
-    <div className="max-w-lg mx-auto mt-10">
-      <h1 className="text-3xl font-bold text-center mb-6">To-Do List</h1>
+
+    <div className="max-w-lg mx-auto mt-10 bg-gray-100 p-6 rounded-lg shadow-md">
+      <h1 className="text-4xl font-bold text-center text-purple-800 mb-6">To-Do List</h1>
       <div className="flex mb-4">
         <input
           type="text"
           value={taskTitle}
           onChange={(e) => setTaskTitle(e.target.value)}
           placeholder="Add a new task"
-          className="input px-2 py-1 rounded-md w-full"
+          className="input px-4 py-2 rounded-l-md w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
-        <button className="bg-blue-500 text-white px-4 py-2 ml-2 rounded-md" onClick={handleAddTask}>
+        <button className="bg-purple-600 text-white px-6 py-2 rounded-r-md hover:bg-purple-700 transition-colors" onClick={handleAddTask}>
           Add Task
         </button>
       </div>
 
       {loading ? (
-        <p>Loading tasks...</p>
+        <p className="text-center text-gray-500">Loading tasks...</p>
       ) : (
-        <ul className="list-disc pl-5">
+        <ul className="list-none">
           {Array.isArray(state) && state.length > 0 ? (
             state.map((task: Task) => (
-              <li key={task.id} className="flex items-center justify-between mb-2">
-                <input
-                  type="checkbox"
-                  checked={task.completed}
-                  onChange={() => handleToggleComplete(task.id)}
-                />
-                <input
-                  type="text"
-                  value={task.title}
-                  onChange={(e) => handleEditTask(task.id, e.target.value)}
-                  className="border p-1 w-full ml-2"
-                />
+              <li key={task.id} className="flex items-center justify-between bg-white p-4 mb-2 rounded-md shadow-sm">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={task.completed}
+                    onChange={() => handleToggleComplete(task.id)}
+                    className="form-checkbox h-5 w-5 text-purple-600 rounded"
+                  />
+                  <input
+                    type="text"
+                    value={task.title}
+                    onChange={(e) => handleEditTask(task.id, e.target.value)}
+                    className={`border-0 p-2 w-full ml-3 focus:outline-none ${task.completed ? 'line-through text-gray-500' : 'text-gray-800'}`}
+                  />
+                
                 <button
-                  className="bg-red-500 text-white p-2 ml-2 rounded-md"
+                  className="bg-red-500 text-white px-3 py-1 ml-3 rounded-md hover:bg-red-600 transition-colors"
                   onClick={() => handleDeleteTask(task.id)}
                 >
                   Delete
                 </button>
+                </div>
               </li>
             ))
           ) : (
-            <p>No tasks available</p>
+            <p className="text-center text-gray-500">No tasks available</p>
           )}
         </ul>
       )}

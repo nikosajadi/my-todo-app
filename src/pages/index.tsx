@@ -118,9 +118,13 @@ import LocalTaskComponent  from '@/components/localTaskComponent'
 
 const IndexPage: React.FC = () => {
   return (
+    
+
     <TaskProvider>  {/* TaskProvider در سطح والد قرار دارد */}
       <LocalTaskComponent />
     </TaskProvider>
+  
+    
   );
 };
 

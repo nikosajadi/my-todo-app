@@ -132,7 +132,7 @@ const LocalTaskComponent: React.FC = () => {
 
   // Render the UI
   return (
-    <div className="max-w-lg mx-auto mt-10 bg-gray-100 p-6 rounded-lg shadow-md">
+    <div className=" font-serif max-w-lg mx-auto mt-10 bg-purple-300 p-6 rounded-lg shadow-md">
       <h1 className="text-4xl font-bold text-center text-purple-800 mb-6">To-Do List</h1>
       <div className="flex mb-4">
         <input
@@ -168,8 +168,9 @@ const LocalTaskComponent: React.FC = () => {
                     className={`border-0 p-2 w-full ml-3 focus:outline-none ${task.completed ? 'line-through text-gray-500' : 'text-gray-800'}`}
                   />
                   <button
-                    className="bg-red-500 text-white px-3 py-1 ml-3 rounded-md hover:bg-red-600 transition-colors"
+                    className="bg-purple-500 text-white px-3 py-1 ml-3 rounded-md hover:bg-purple-200 transition-colors"
                     onClick={() => handleDeleteTask(task.id)}  // Delete the task on button click
+                    
                   >
                     Delete
                   </button>
@@ -177,7 +178,7 @@ const LocalTaskComponent: React.FC = () => {
               </li>
             ))
           ) : (
-            <p className="text-center text-gray-500">No tasks available</p>  // Show message if there are no tasks
+            <p className="text-center font-bold text-purple-800">No tasks available</p>  // Show message if there are no tasks
           )}
         </ul>
       )}

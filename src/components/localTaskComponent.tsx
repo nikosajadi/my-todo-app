@@ -154,13 +154,18 @@ const LocalTaskComponent: React.FC = () => {
           {Array.isArray(state) && state.length > 0 ? (  // Render tasks if state contains tasks
             state.map((task: Task) => (
               <li key={task.id} className="flex items-center justify-between bg-white p-4 mb-2 rounded-md shadow-sm">
-                <div className="flex items-center">
+                <div className="flex items-center relative">
                   <input
                     type="checkbox"
                     checked={task.completed}
-                    onChange={() => handleToggleComplete(task.id)}  // Toggle task completion on checkbox change
-                    className="form-checkbox h-5 w-5 text-purple-600 rounded"
+                    onChange={() => handleToggleComplete(task.id)}
+                    className="appearance-none h-5 w-5 border-2 rounded-full border-gray-300 checked:bg-green-500"
                   />
+                  {task.completed && (
+                    <svg className="absolute top-0 left-0 w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L7.5 13.086l-2.793-2.793a1 1 0 10-1.414 1.414l3.5 3.5a1 1 0 001.414 0l8.5-8.5a1 1 0 000-1.414z" clipRule="evenodd" />
+                    </svg>
+                  )}
                   <input
                     type="text"
                     value={task.title}

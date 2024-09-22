@@ -1,6 +1,6 @@
 // You can use a temporary in-memory store or connect to a database for persistent storage.
 // For this example, I'm using a temporary store for simplicity.
-let tasks = [];
+let tasks = any=[];
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
@@ -18,12 +18,14 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
     case 'PUT':
       const { id, title } = req.body;
-      const taskIndex = tasks.findIndex(task => task.id == id);
+      const taskIndex = tasks.findIndex((task:any) => task.id == id);
       if (taskIndex === -1) {
         return res.status(404).json({ message: 'Task not found' });
       }
       tasks[taskIndex].title = title; // Update task title
-      res.status(200).json({ id, title });
+      tasks[taskIndex].completed = completed;
+      //res.status(200).json({ id, title });
+      res.status(200).json(tasks[taskIndex]);
       break;
 
     case 'DELETE':

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { TaskContext } from '@/context/taskContext'; 
-
+import { Icon } from '@iconify/react'; 
+import { title } from 'process';
 // Interface defining the structure of a Task
 interface Task {
   id: string;
@@ -85,13 +86,13 @@ const LocalTaskComponent: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id: taskId, title: newTitle }),  // Send updated task title to the server
+        body: JSON.stringify({ id: taskId,title:newTitle, completed: task.completed  }),  // Send updated task title to the server
       });
 
-      if (!response.ok) throw new Error('Failed to edit task');  // Handle failed API request
+      if (!response.ok) throw new Error('Failed to edit task'); 
       await fetchTasks();  // Re-fetch tasks after editing the task
     } catch (error) {
-      console.error('Error editing task:', error);  // Log any errors encountered during editing
+      console.error('Error editing task:', error); 
     }
   };
 
@@ -102,7 +103,7 @@ const LocalTaskComponent: React.FC = () => {
         method: 'DELETE',  // Delete the task from the server
       });
 
-      if (!response.ok) throw new Error('Failed to delete task');  // Handle failed API request
+      if (!response.ok) throw new Error('Failed to delete task');  
       await fetchTasks();  // Re-fetch tasks after deleting the task
     } catch (error) {
       console.error('Error deleting task:', error);  // Log any errors encountered during deletion
@@ -120,13 +121,13 @@ const LocalTaskComponent: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id: taskId, completed: !task.completed }),  // Toggle the task's completed status
+        body: JSON.stringify({ id: taskId,title:title, completed: !task.completed }),  
       });
 
-      if (!response.ok) throw new Error('Failed to toggle task completion');  // Handle failed API request
+      if (!response.ok) throw new Error('Failed to toggle task completion'); 
       await fetchTasks();  // Re-fetch tasks after toggling completion
     } catch (error) {
-      console.error('Error toggling task completion:', error);  // Log any errors encountered during toggling
+      console.error('Error toggling task completion:', error); 
     }
   };
 
@@ -158,19 +159,17 @@ const LocalTaskComponent: React.FC = () => {
                   <input
                     type="checkbox"
                     checked={task.completed}
-                    onChange={() => handleToggleComplete(task.id)}
-                    className="appearance-none h-5 w-5 border-2 rounded-full border-gray-300 checked:bg-green-500"
+                    onChange={() => handleToggleComplete(task.id.task.title)}  // Toggle task completion on checkbox change
+                    className={`form-checkbox h-5 w-5 rounded-full bg-white border-2 ${
+                      task.completed ? 'bg-green-500 text-white border-green-500' : 'border-gray-300'
+                    }`}
                   />
-                  {task.completed && (
-                    <svg className="absolute top-0 left-0 w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L7.5 13.086l-2.793-2.793a1 1 0 10-1.414 1.414l3.5 3.5a1 1 0 001.414 0l8.5-8.5a1 1 0 000-1.414z" clipRule="evenodd" />
-                    </svg>
-                  )}
+
                   <input
                     type="text"
                     value={task.title}
                     onChange={(e) => handleEditTask(task.id, e.target.value)}  // Update task title on change
-                    className={`border-0 p-2 w-full ml-3 focus:outline-none ${task.completed ? 'line-through text-gray-500' : 'text-gray-800'}`}
+                  
                   />
                   <button
                     className="bg-purple-500 text-white px-3 py-1 ml-3 rounded-md hover:bg-purple-200 transition-colors"
@@ -183,12 +182,14 @@ const LocalTaskComponent: React.FC = () => {
               </li>
             ))
           ) : (
-            <p className="text-center font-bold text-purple-800">No tasks available</p>  // Show message if there are no tasks
+            <p className="text-center font-bold text-purple-800">
+              No tasks availablen
+            </p>
           )}
         </ul>
       )}
     </div>
   );
-};
 
+}
 export default LocalTaskComponent;

@@ -86,7 +86,7 @@ const LocalTaskComponent: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id: taskId,title:newTitle, completed: task.completed  }),  // Send updated task title to the server
+        body: JSON.stringify({ id: taskId, title: newTitle, completed: task.completed  }),  // Send updated task title to the server
       });
 
       if (!response.ok) throw new Error('Failed to edit task'); 
@@ -121,7 +121,7 @@ const LocalTaskComponent: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id: taskId,title:title, completed: !task.completed }),  
+        body: JSON.stringify({ id: taskId, title: title, completed: !task.completed }),  
       });
 
       if (!response.ok) throw new Error('Failed to toggle task completion'); 
@@ -159,7 +159,7 @@ const LocalTaskComponent: React.FC = () => {
                   <input
                     type="checkbox"
                     checked={task.completed}
-                    onChange={() => handleToggleComplete(task.id.task.title)}  // Toggle task completion on checkbox change
+                    onChange={() => handleToggleComplete(task.id, task.title)}  // Toggle task completion on checkbox change
                     className={`form-checkbox h-5 w-5 rounded-full bg-white border-2 ${
                       task.completed ? 'bg-green-500 text-white border-green-500' : 'border-gray-300'
                     }`}
